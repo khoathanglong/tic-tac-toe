@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<!-- Latest compiled and minified CSS -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+	<!-- jQuery library -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	<!-- Latest compiled JavaScript -->
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.2.1.min.js"></script>
+
+</head>
+<body>
+
+<div id='gameBox' class='container'>
+	<h2 class='welcome text-center'>Welcome to the Tic-Tac-Toe game</h2>
+	<h1 class='selecting text-center'>Do you want<br><span id='chooseX'>X</span> or <span id='chooseO'>O</span></h1>
+	<div class='row'>
+		<div class='col-xs-4' id="space0"></div>
+		<div class='col-xs-4' id="space1"></div>
+		<div class='col-xs-4' id="space2"></div>
+	</div>
+	<div class='row'>
+		<div class='col-xs-4' id="space3"></div>
+		<div class='col-xs-4' id="space4"></div>
+		<div class='col-xs-4' id="space5"></div>
+	</div>
+	<div class='row'>
+		<div class='col-xs-4' id="space6"></div>
+		<div class='col-xs-4' id="space7"></div>
+		<div class='col-xs-4' id="space8"></div>
+	</div>
+	<div class='text-center resetGame'>Reset Game</div>
+</div>
+
+<style>
+body{
+	color: darkgreen;
+}
+#gameBox{
+width: 307px;
+}
+.col-xs-4{
+	font-size: 50px;
+	padding-top: 12px;
+	padding-left: 27px;
+}
+.col-xs-4:hover,span:hover,.resetGame:hover{
+	cursor: pointer;
+}
+.resetGame{
+	background-color: darkcyan;
+	color: white;
+}
+#chooseX{
+	color: darkgoldenrod;
+}
+#chooseO{
+	color: red;
+}
+.welcome,.selecting{
+	border: solid ;
+	background-color: #9BD770;
+}
+</style>
+<script>
+$(document).ready(function(){
+	$('.resetGame').click(function(){
+		window.location.reload(true)
+	})
+	startGame()
+function startGame(){	
+	$('.selecting,.resetGame').hide()
+	setTimeout(function(){
+		$('.welcome').slideUp(1000)
+		$('.selecting').slideDown(1000)
+		},2000)
+	for (var i=0;i<9;i++){
+		$('#space'+i).css({'background':'rgba(0,100,0,1)',
+			'margin':'1px',
+			'height':'100px','width':'100px',
+			'border':'solid orange',
+			'color':'rgba(0,100,0,1)',
+			'box-shadow':'inset 0px 0px 9px #000000'})
+					 .val(i);//give value from 0 to 9 to each cell  //modify css and add value to each cell
+	};
+
+	$('span').click(function(){
+		$('.resetGame').slideDown(1000);
+		if ($(this).text()=='X'){
+			you='X'
+			bot='O' //keep you a Global variables
+		}
+		else{
+			bot='X'
+			you='O'
+		}
+		$('h1').hide()
+		$('.selecting').text('I challenge you to beat me')
+					.slideDown(1000)
+	});
+	var list=[]; //create a list to check if a celled is checked or not. if a cell was cheched before, nothing happens
+	var arr=[[],
+			 [],
+			 []]; // create an 2-d empty list and add "" value into it, in order to check winning condition
+	for (var i = 0; i < 3; i++) {
+		arr[0].push($('#space'+i).text())
+		}
+	for (var i = 3; i < 6; i++) {
+		arr[1].push($('#space'+i).text())
+		}
+	for (var i = 6; i < 9; i++) {
+		arr[2].push($('#space'+i).text())
+		}
+	
+	$('.col-xs-4').click(function(){
+		//Case bot goes second
+	function firstMove(value){
+		var botMove;
+		if(value==4){//firstBot move is  at corner
+			botMove=[0,2,6,8][Math.floor(Math.random()*4)]
+		}
+		else{ //first Bot move is at the middle
+			botMove=4;}
+		$('#space'+botMove).text(bot)
+							.css('color','white');
+		addValue(botMove);
+		list.push(botMove)
+		return botMove //define 2 cases of first player's moves
+	}
+	function secondMove(arr){
+		var botMove=-1;
+		var arrCol0=[arr[0][0],arr[1][0],arr[2][0]];
+		var arrCol1=[arr[0][1],arr[1][1],arr[2][1]];
+		var arrCol2=[arr[0][2],arr[1][2],arr[2][2]];
+		var arrDiagonal0=[arr[0][0],arr[1][1],arr[2][2]];
+		var arrDiagonal2=[arr[0][2],arr[1][1],arr[2][0]];
+
+		var count0=countingTurn(arr[0],you)
+		var count1=countingTurn(arr[1],you)
+		var count2=countingTurn(arr[2],you)
+		var col0=countingTurn(arrCol0,you)
+		var col1=countingTurn(arrCol1,you)
+		var col2=countingTurn(arrCol2,you)
+		var diagonal0=countingTurn(arrDiagonal0,you)
+		var diagonal2=countingTurn(arrDiagonal2,you)
+
+		var botCount0=countingTurn(arr[0],bot)
+		var botCount1=countingTurn(arr[1],bot)
+		var botCount2=countingTurn(arr[2],bot)
+		var botCol0=countingTurn(arrCol0,bot)
+		var botCol1=countingTurn(arrCol1,bot)
+		var botCol2=countingTurn(arrCol2,bot)
+		var botDiagonal0=countingTurn(arrDiagonal0,bot)
+		var botDiagonal2=countingTurn(arrDiagonal2,bot)
+
+		if((botCount0==2&&arr[0].includes(''))||
+			(botCount1==2&&arr[1].includes(''))||
+			(botCount2==2&&arr[2].includes(''))||
+			(botCol0==2&&arrCol0.includes(''))||
+			(botCol1==2&&arrCol1.includes(''))||
+			(botCol2==2&&arrCol2.includes(''))||
+			(botDiagonal0==2&&arrDiagonal0.includes(''))||
+			(botDiagonal2==2&&arrDiagonal2.includes(''))){
+			
+			if (botCount0==2&&arr[0].includes('')){
+				botMove=arr[0].indexOf('')
+			}
+			else if (botCount1==2&&arr[1].includes('')){
+				botMove=arr[1].indexOf('')+3
+			}
+			else if (botCount2==2&&arr[2].includes('')){
+				botMove=arr[2].indexOf('')+6
+			}
+			else if(botCol0==2&&arrCol0.includes('')){
+				botMove=arrCol0.indexOf('')*3;
+			}
+			else if(botCol1==2&&arrCol1.includes('')){
+				botMove=arrCol1.indexOf('')*3+1;
+			}
+			else if(botCol2==2&&arrCol2.includes('')){
+				botMove=arrCol2.indexOf('')*3+2;//not done yet
+			}
+			else if(botDiagonal0==2&&arrDiagonal0.includes('')){
+				botMove=arrDiagonal0.indexOf('')*4
+			}
+			else if(botDiagonal2==2&&arrDiagonal2.includes('')){
+				botMove=arrDiagonal2.indexOf('')*2+2
+			}
+		}
+		else if((count0==2&&arr[0].includes(''))||
+			(count1==2&&arr[1].includes(''))||
+			(count2==2&&arr[2].includes(''))||
+			(col0==2&&arrCol0.includes(''))||
+			(col1==2&&arrCol1.includes(''))||
+			(col2==2&&arrCol2.includes(''))||
+			(diagonal0==2&&arrDiagonal0.includes(''))||
+			(diagonal2==2&&arrDiagonal2.includes(''))){
+			
+			if (count0==2&&arr[0].includes('')){
+				botMove=arr[0].indexOf('')
+			}
+			else if (count1==2&&arr[1].includes('')){
+				botMove=arr[1].indexOf('')+3
+			}
+			else if (count2==2&&arr[2].includes('')){
+				botMove=arr[2].indexOf('')+6
+			}
+			else if(col0==2&&arrCol0.includes('')){
+				botMove=arrCol0.indexOf('')*3;
+			}
+			else if(col1==2&&arrCol1.includes('')){
+				botMove=arrCol1.indexOf('')*3+1;
+			}
+			else if(col2==2&&arrCol2.includes('')){
+				botMove=arrCol2.indexOf('')*3+2;//not done yet
+			}
+			else if(diagonal0==2&&arrDiagonal0.includes('')){
+				botMove=arrDiagonal0.indexOf('')*4
+			}
+			else if(diagonal2==2&&arrDiagonal2.includes('')){
+				botMove=arrDiagonal2.indexOf('')*2+2
+			}		 
+		}
+		if (botMove==-1){
+			 for (var k=0;k<9;k++){
+				if($('#space'+k).text()==''){
+					botMove=k;
+				}	
+			}	
+		}	
+		$('#space'+botMove).text(bot)
+			.css('color','white');
+			addValue(botMove)
+			list.push(botMove) //posibility of different moves after the first one
+		arrCol0=[arr[0][0],arr[1][0],arr[2][0]];  //update these array to use for whoWin function
+		arrCol1=[arr[0][1],arr[1][1],arr[2][1]];  //if not Update, the whoWin Function will be delayed one turn
+		arrCol2=[arr[0][2],arr[1][2],arr[2][2]];
+		arrDiagonal0=[arr[0][0],arr[1][1],arr[2][2]];
+		arrDiagonal2=[arr[0][2],arr[1][1],arr[2][0]];	
+		if(whoWin(arrCol0)==you||
+			whoWin(arrCol1)==you||
+			whoWin(arrCol2)==you||
+			whoWin(arrDiagonal0)==you||
+			whoWin(arrDiagonal2)==you||
+			whoWin(arr[0])==you||
+			whoWin(arr[1])==you||
+			whoWin(arr[2])==you){
+			$('.welcome').text('Congrats, You Win')
+				.slideDown();
+			$('.selecting').slideUp()
+			$('.row').animate({
+				opacity:'0.5'
+			})
+			}
+		else if(whoWin(arrCol0)==bot||	
+			whoWin(arrCol1)==bot||
+			whoWin(arrCol2)==bot||
+			whoWin(arrDiagonal0)==bot||
+			whoWin(arrDiagonal2)==bot||
+			whoWin(arr[0])==bot||
+			whoWin(arr[1])==bot||
+			whoWin(arr[2])==bot){
+			$('.welcome').text('You Loser')
+				.slideDown();
+			$('.selecting').slideUp()
+			$('.row').animate({
+				opacity:'0.5'
+			})
+			}
+
+		else if(list.length>8){
+			$('.welcome').text('Draw, Lucky You')
+				.slideDown();
+			$('.selecting').slideUp()
+			$('.row').animate({
+				opacity:'0.5'
+			})
+			}
+	}
+	function countingTurn(array,you){
+	 var count=0;
+		for (var i=0;i<array.length;i++){
+			if (array[i]==you){
+				count+=1
+			}	
+		}
+		return count; //if the array have 2 marked, count+=1 until count =2 at least
+	}
+	function addValue(value){
+		 if(value==1||value==0||value==2){
+			arr[0][value]=$('#space'+value).text()
+		 }
+		 else if(value==4|value==3||value==5){
+			arr[1][value-3]=$('#space'+value).text()
+		 }
+		 else{
+			arr[2][value-6]=$('#space'+value).text()
+		 } //add the marked (O or X) into the Array
+	}
+	function whoWin(arr){
+			if (arr[0]==you&&arr[1]==you&&arr[2]==you){
+				console.log(arr[0],arr[1],arr[2])
+				return you
+			}
+			else if(arr[0]==bot&&arr[1]==bot&&arr[2]==bot){
+				console.log(arr[0],arr[1],arr[2])
+				return bot
+			}
+	}
+
+	var value=Number($(this).val());
+	if(!list.includes(value)){ //cell that is not checked yet (so you cannot check 1 cell twice)
+		$(this).text(you)
+			   .css('color','white');
+		list.push(value) //cell checked is to push into list
+		addValue(value)
+		if(list.length==1){
+			firstMove(value)
+		}
+		else if(list.length){
+			secondMove(arr)	
+		}
+	}
+	});
+}
+});	
+</script>
+</body>
+</html>
